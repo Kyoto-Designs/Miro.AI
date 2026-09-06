@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MIRO.AI — Intelligent Workspace</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+darkMode: 'class',
+theme: {
+extend: {
+colors: {
+miro: {
+bg: '#000000',
+surface: '#0d0d0f',
+card: '#141417',
+border: '#23232a',
+hover: '#1c1c22',
+purple: '#7c3aed',
+purpleDark: '#581c87',
+purpleGlow: 'rgba(124, 58, 237, 0.25)',
+text: '#ffffff',
+muted: '#9ca3af',
+lightMuted: '#6b7280'
+}
+},
+fontFamily: {
+sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+mono: ['JetBrains Mono', 'Fira Code', 'Consolas', 'monospace']
+},
+animation: {
+'pulse-glow': 'pulseGlow 3s infinite ease-in-out',
+'fade-in': 'fadeIn 0.2s ease-out forwards',
+'slide-up': 'slideUp 0.25s ease-out forwards'
+},
+keyframes: {
+pulseGlow: {
+'0%, 100%': { boxShadow: '0 0 15px rgba(124, 58, 237, 0.2)' },
+'50%': { boxShadow: '0 0 30px rgba(124, 58, 237, 0.45)' }
+},
+fadeIn: {
+'0%': { opacity: '0' },
+'100%': { opacity: '1' }
+},
+slideUp: {
+'0%': { opacity: '0', transform: 'translateY(10px)' },
+'100%': { opacity: '1', transform: 'translateY(0)' }
+}
+}
+}
+}
+};
+</script>
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- Marked Markdown Parser -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<!-- Syntax Highlighting -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.8.0/styles/github-dark.min.css">
+<script src="https://cdn.jsdelivr.net/npm/highlight.js@11.8.0/highlight.min.js"></script>
+<style>
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+width: 6px;
+height: 6px;
+}
+::-webkit-scrollbar-track {
+background: transparent;
+}
+::-webkit-scrollbar-thumb {
+background: #27272a;
+border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+background: #3f3f46;
+}
+body {
+background-color: #000000;
+color: #ffffff;
+font-family: 'Inter', sans-serif;
+overflow: hidden;
+height: 100dvh;
+}
+/* Markdown Styling Inside Chat Messages */
+.markdown-body {
+color: #e4e4e7;
+font-size: 0.95rem;
+line-height: 1.65;
+}
+.markdown-body p {
+margin-bottom: 0.85em;
+}
+.markdown-body p:last-child {
+margin-bottom: 0;
+}
+.markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4 {
+color: #ffffff;
+font-weight: 600;
+margin-top: 1.25em;
+margin-bottom: 0.5em;
+line-height: 1.3;
+}
+.markdown-body h1 { font-size: 1.4rem; border-bottom: 1px solid #27272a; padding-bottom: 0.3em; }
+.markdown-body h2 { font-size: 1.2rem; }
+.markdown-body h3 { font-size: 1.05rem; }
+.markdown-body ul, .markdown-body ol {
+margin-top: 0.4em;
+margin-bottom: 0.85em;
+padding-left: 1.4em;
+}
+.markdown-body ul { list-style-type: disc; }
+.markdown-body ol { list-style-type: decimal; }
+.markdown-body li { margin-bottom: 0.25em; }
+.markdown-body blockquote {
+border-left: 3px solid #7c3aed;
+padding-left: 1rem;
+color: #a1a1aa;
+margin: 0.85em 0;
+font-style: italic;
+background: rgba(124, 58, 237, 0.05);
+border-radius: 0 6px 6px 0;
+padding-top: 0.25rem;
+padding-bottom: 0.25rem;
+}
+.markdown-body code:not(pre code) {
+background-color: #1f1f23;
+color: #e4e4e7;
+padding: 0.15em 0.4em;
+border-radius: 4px;
+font-family: 'JetBrains Mono', monospace;
+font-size: 0.85em;
+border: 1px solid #27272a;
+}
+.markdown-body pre {
+background: #0d0d0f !important;
+border: 1px solid #23232a;
+border-radius: 8px;
+margin: 0.9em 0;
+overflow-x: auto;
+}
+.markdown-body table {
+width: 100%;
+border-collapse: collapse;
+margin: 1em 0;
+font-size: 0.9em;
+}
+.markdown-body th, .markdown-body td {
+border: 1px solid #27272a;
+padding: 0.5em 0.75em;
+text-align: left;
+}
+.markdown-body th {
+background-color: #141417;
+color: #ffffff;
+font-weight: 600;
+}
+.markdown-body tr:nth-child(even) {
+background-color: rgba(255, 255, 255, 0.02);
+}
+/* Ambient Glow Backgrounds */
+.bg-purple-glow {
+background: radial-gradient(circle at 50% 20%, rgba(124, 58, 237, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+}
+.purple-border-glow:focus-within {
+border-color: #7c3aed;
+box-shadow: 0 0 15px rgba(124, 58, 237, 0.3);
+}
+/* Typing cursor effect */
+.streaming-cursor::after {
+content: '▋';
+display: inline-block;
+margin-left: 2px;
+color: #7c3aed;
+animation: blink 0.8s infinite;
+}
+@keyframes blink {
+0%, 100% { opacity: 1; }
+50% { opacity: 0; }
+}
+</style>
+</head>
+<body class="bg-black text-white flex h-full antialiased select-none">
+<!-- MOBILE OVERLAY BACKDROP -->
+<div id="sidebarOverlay" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 hidden md:hidden transition-opacity duration-200"></div>
+<!-- LEFT SIDEBAR -->
+<aside id="sidebar" class="fixed md:static inset-y-0 left-0 z-50 w-72 bg-[#09090b] border-r border-[#1f1f23] flex flex-col transition-transform duration-200 transform -translate-x-full md:translate-x-0 h-full">
+<!-- BRAND HEADER -->
+<div class="p-4 flex items-center justify-between border-b border-[#1f1f23]">
+<div class="flex items-center gap-2.5 cursor-pointer" id="brandLogoBtn">
+<div class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-600 to-indigo-800 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-purple-900/40">
+M
+</div>
+<div>
+<h1 class="font-bold text-base tracking-wider text-white leading-none">MIRO<span class="text-purple-400">.AI</span></h1>
+<span class="text-[10px] text-zinc-500 font-medium tracking-wider">INTELLIGENT WORKSPACE</span>
+</div>
+</div>
+<button id="closeSidebarMobile" class="md:hidden text-zinc-400 hover:text-white p-1 rounded-md">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+</button>
+</div>
+<!-- NEW CHAT BUTTON -->
+<div class="p-3">
+<button id="newChatSidebarBtn" class="w-full flex items-center justify-center gap-2 bg-white text-black font-semibold text-sm py-2.5 px-4 rounded-xl hover:bg-zinc-200 transition-all shadow-md active:scale-[0.98]">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+New Chat
+</button>
+</div>
+<!-- MODE QUICK SWITCHER SIDEBAR LIST -->
+<div class="px-3 py-2 border-b border-[#1f1f23]">
+<div class="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider px-2 mb-1.5">Miro Modes</div>
+<div class="space-y-0.5" id="sidebarModeList">
+<!-- Rendered dynamically -->
+</div>
+</div>
+<!-- CONVERSATION HISTORY -->
+<div class="flex-1 overflow-y-auto px-3 py-2">
+<div class="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider px-2 mb-1.5 flex justify-between items-center">
+<span>Recent Chats</span>
+<button id="clearAllChatsBtn" class="text-[10px] text-zinc-600 hover:text-red-400 transition-colors">Clear All</button>
+</div>
+<div id="conversationHistoryList" class="space-y-1">
+<!-- History items dynamically rendered -->
+</div>
+</div>
+<!-- SIDEBAR FOOTER & SETTINGS -->
+<div class="p-3 border-t border-[#1f1f23] bg-[#09090b]">
+<button id="openSettingsBtn" class="w-full flex items-center justify-between p-2 rounded-lg hover:bg-[#141417] text-zinc-300 hover:text-white text-xs font-medium transition-colors">
+<div class="flex items-center gap-2.5">
+<svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+<span>Workspace Settings</span>
+</div>
+<span class="text-[10px] bg-purple-950/80 text-purple-300 px-1.5 py-0.5 rounded border border-purple-800/40">xKiro</span>
+</button>
+</div>
+</aside>
+<!-- MAIN WORKSPACE -->
+<main class="flex-1 flex flex-col h-full relative overflow-hidden bg-black">
+<!-- TOP NAVBAR -->
+<header class="h-14 border-b border-[#1a1a1e] bg-[#000000]/80 backdrop-blur-md px-4 flex items-center justify-between z-10 shrink-0">
+<!-- Left Controls (Mobile Menu Toggle + Active Mode Pill) -->
+<div class="flex items-center gap-3">
+<button id="openSidebarMobile" class="md:hidden text-zinc-400 hover:text-white p-1 rounded-md">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+</button>
+<!-- Mode Dropdown / Info Trigger -->
+<div class="relative" id="modeDropdownWrapper">
+<button id="modeSelectBtn" class="flex items-center gap-2 bg-[#121215] hover:bg-[#1a1a20] border border-[#23232a] text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors">
+<span id="activeModeIcon">✨</span>
+<span id="activeModeText" class="text-white">MIRO</span>
+<svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+</button>
+<!-- Mode Selector Dropdown Menu -->
+<div id="modeDropdownMenu" class="absolute left-0 mt-2 w-64 bg-[#121215] border border-[#23232a] rounded-xl shadow-2xl z-50 hidden py-1.5 divide-y divide-[#1f1f26]">
+<div class="p-1.5 space-y-1" id="modeListContainer">
+<!-- Mode items dynamically added -->
+</div>
+</div>
+</div>
+</div>
+<!-- Center / Right Controls (Model & Personality Selectors) -->
+<div class="flex items-center gap-2">
+<!-- Model Selector -->
+<div class="relative" id="modelDropdownWrapper">
+<button id="modelSelectBtn" class="flex items-center gap-1.5 bg-[#121215] hover:bg-[#1a1a20] border border-[#23232a] text-xs font-medium px-2.5 py-1.5 rounded-lg text-zinc-300 hover:text-white transition-colors">
+<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+<span id="activeModelText">Qwen3.5 Omni Plus</span>
+<svg class="w-3 h-3 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+</button>
+<div id="modelDropdownMenu" class="absolute right-0 mt-2 w-72 bg-[#121215] border border-[#23232a] rounded-xl shadow-2xl z-50 hidden p-1.5 space-y-1">
+<div class="text-[10px] font-semibold text-zinc-500 uppercase px-2 py-1">Select AI Model</div>
+<div id="modelListContainer" class="space-y-1">
+<!-- Models dynamically added -->
+</div>
+</div>
+</div>
+<!-- Personality Selector -->
+<div class="relative hidden sm:block" id="personalityDropdownWrapper">
+<button id="personalitySelectBtn" class="flex items-center gap-1.5 bg-[#121215] hover:bg-[#1a1a20] border border-[#23232a] text-xs font-medium px-2.5 py-1.5 rounded-lg text-zinc-400 hover:text-white transition-colors">
+<span class="text-purple-400">🎭</span>
+<span id="activePersonalityText">Balanced</span>
+<svg class="w-3 h-3 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+</button>
+<div id="personalityDropdownMenu" class="absolute right-0 mt-2 w-48 bg-[#121215] border border-[#23232a] rounded-xl shadow-2xl z-50 hidden p-1.5">
+<div class="text-[10px] font-semibold text-zinc-500 uppercase px-2 py-1">AI Tone & Style</div>
+<div id="personalityListContainer" class="space-y-0.5">
+<!-- Personalities dynamically added -->
+</div>
+</div>
+</div>
+<!-- Quick Reset Chat Button -->
+<button id="resetChatHeaderBtn" title="New Chat" class="p-1.5 text-zinc-400 hover:text-white bg-[#121215] hover:bg-[#1a1a20] border border-[#23232a] rounded-lg transition-colors">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+</button>
+</div>
+</header>
+<!-- CHAT MESSAGES CONTAINER -->
+<div id="chatScrollArea" class="flex-1 overflow-y-auto px-4 md:px-8 py-6 space-y-6 scroll-smooth bg-purple-glow">
+<!-- WELCOME / EMPTY STATE VIEW -->
+<div id="welcomeScreen" class="max-w-2xl mx-auto h-full flex flex-col items-center justify-center text-center py-12 animate-fade-in">
+<!-- Animated MIRO Logo Badge -->
+<div class="relative mb-6 group">
+<div class="absolute -inset-1 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl blur opacity-40 group-hover:opacity-75 transition duration-500 animate-pulse-glow"></div>
+<div class="relative w-16 h-16 rounded-2xl bg-black border border-purple-500/30 flex items-center justify-center text-white font-bold text-2xl shadow-2xl">
+M
+</div>
+</div>
+<h2 id="welcomeTitle" class="text-3xl md:text-4xl font-extrabold tracking-tight text-white mb-2">MIRO<span class="text-purple-500">.AI</span></h2>
+<p id="welcomeSubtitle" class="text-zinc-400 text-sm md:text-base max-w-md mb-8">Your intelligent workspace.</p>
+<!-- Prompt Suggestions Cards Grid -->
+<div id="promptSuggestionsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full text-left">
+<!-- Suggestion Cards injected dynamically based on mode -->
+</div>
+</div>
+<!-- MESSAGES FEED LIST -->
+<div id="messagesFeed" class="max-w-3xl mx-auto space-y-6 hidden">
+<!-- Chat bubbles rendered here -->
+</div>
+</div>
+<!-- FLOATING CHAT COMPOSER -->
+<div class="p-3 md:p-4 border-t border-[#1a1a1e] bg-black/90 backdrop-blur-md z-10 shrink-0">
+<div class="max-w-3xl mx-auto">
+<!-- COMPOSER CARD -->
+<div id="composerCard" class="relative bg-[#0d0d10] border border-[#23232a] focus-within:border-purple-500/80 rounded-2xl shadow-xl transition-all duration-200">
+<textarea id="userInput" rows="1" placeholder="Ask MIRO anything..." class="w-full bg-transparent text-white placeholder-zinc-500 text-sm md:text-base px-4 pt-3.5 pb-2 border-0 focus:ring-0 focus:outline-none resize-none overflow-y-auto max-h-40 font-sans"></textarea>
+<!-- BOTTOM ACTIONS BAR INSIDE COMPOSER -->
+<div class="flex items-center justify-between px-3 pb-2.5 pt-1 border-t border-zinc-900/60">
+<!-- Left Badges -->
+<div class="flex items-center gap-2">
+<span id="composerModeBadge" class="text-[11px] font-medium text-purple-300 bg-purple-950/60 border border-purple-800/40 px-2 py-0.5 rounded-md flex items-center gap-1">
+✨ MIRO
+</span>
+<span id="composerModelBadge" class="text-[11px] font-medium text-zinc-400 bg-zinc-900 px-2 py-0.5 rounded-md hidden sm:inline-block">
+Qwen3.5 Omni
+</span>
+</div>
+<!-- Right Controls (Send / Stop Button) -->
+<div class="flex items-center gap-2">
+<span id="charCounter" class="text-[10px] text-zinc-600 hidden md:inline">Enter to send</span>
+<!-- Stop Button -->
+<button id="stopGenerationBtn" class="hidden flex items-center gap-1.5 bg-red-950/80 hover:bg-red-900 border border-red-800/50 text-red-200 text-xs font-medium px-3 py-1.5 rounded-xl transition-all">
+<span class="w-2 h-2 bg-red-400 rounded-sm"></span>
+<span>Stop</span>
+</button>
+<!-- Send Button -->
+<button id="sendMessageBtn" class="bg-white text-black hover:bg-zinc-200 font-bold p-2 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 12h14M12 5l7 7-7 7"/></svg>
+</button>
+</div>
+</div>
+</div>
+<!-- FOOTER DISCLAIMER -->
+<p class="text-[11px] text-center text-zinc-600 mt-2 font-medium">MIRO.AI powered by xKiro • Real AI Responses</p>
+</div>
+</div>
+</main>
+<!-- SETTINGS MODAL -->
+<div id="settingsModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+<div class="bg-[#0f0f12] border border-[#23232a] rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl animate-fade-in">
+<!-- Modal Header -->
+<div class="px-6 py-4 border-b border-[#23232a] flex items-center justify-between">
+<h3 class="text-base font-bold text-white flex items-center gap-2">
+<svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+Workspace Settings
+</h3>
+<button id="closeSettingsBtn" class="text-zinc-400 hover:text-white p-1 rounded-md">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+</button>
+</div>
+<!-- Modal Body Tabs & Controls -->
+<div class="p-6 space-y-5">
+<!-- Setting 1: Default Model -->
+<div class="flex items-center justify-between">
+<div>
+<label class="text-sm font-semibold text-white block">Default Model</label>
+<span class="text-xs text-zinc-400">Preferred AI engine for new chats</span>
+</div>
+<select id="settingDefaultModel" class="bg-[#18181c] border border-[#27272a] text-xs text-white rounded-lg px-3 py-1.5 focus:outline-none focus:border-purple-500">
+<option value="Qwen3.5 Omni Plus">Qwen3.5 Omni Plus</option>
+<option value="Qwen3 Coder Plus">Qwen3 Coder Plus</option>
+<option value="Qwen3.8 Max">Qwen3.8 Max</option>
+</select>
+</div>
+<!-- Setting 2: Default Mode -->
+<div class="flex items-center justify-between">
+<div>
+<label class="text-sm font-semibold text-white block">Default Mode</label>
+<span class="text-xs text-zinc-400">Primary specialist persona</span>
+</div>
+<select id="settingDefaultMode" class="bg-[#18181c] border border-[#27272a] text-xs text-white rounded-lg px-3 py-1.5 focus:outline-none focus:border-purple-500">
+<option value="MIRO">MIRO (General AI)</option>
+<option value="CastleWizard">CastleWizard (Castle Make & Play)</option>
+<option value="Bloxxer">Bloxxer (Roblox Culture)</option>
+<option value="BloxxerBuild">BloxxerBuild (Roblox Studio)</option>
+<option value="AimMiro">AimMiro (FPS Coach)</option>
+</select>
+</div>
+<!-- Setting 3: Enter to Send -->
+<div class="flex items-center justify-between">
+<div>
+<label class="text-sm font-semibold text-white block">Enter Key Behavior</label>
+<span class="text-xs text-zinc-400">Pressing Enter sends message (Shift+Enter for newline)</span>
+</div>
+<input type="checkbox" id="settingEnterToSend" checked class="w-4 h-4 accent-purple-600 rounded">
+</div>
+<!-- Setting 4: API Status Info -->
+<div class="p-3 bg-purple-950/30 border border-purple-800/30 rounded-xl text-xs space-y-1">
+<div class="flex items-center justify-between text-purple-300 font-semibold">
+<span>xKiro API Gateway</span>
+<span class="flex items-center gap-1 text-[10px] bg-emerald-950 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-800/40">Connected</span>
+</div>
+<p class="text-zinc-400 text-[11px]">Direct client-side obfuscated connection. No backend required.</p>
+</div>
+</div>
+<!-- Modal Footer -->
+<div class="px-6 py-3.5 bg-[#09090b] border-t border-[#23232a] flex justify-end">
+<button id="saveSettingsBtn" class="bg-white text-black font-semibold text-xs px-4 py-2 rounded-xl hover:bg-zinc-200 transition-colors">
+Save Preferences
+</button>
+</div>
+</div>
+</div>
+<!-- JAVASCRIPT APPLICATION CORE -->
+<script>
+/*
+* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+* MIRO.AI CORE APPLICATION ARCHITECTURE
+* Single-File Client App with Obfuscated xKiro Integration
+* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+*/
+// ────────────────────────────────────────────────────────────
+// 1. CONFIGURATION & API OBFUSCATION
+// ────────────────────────────────────────────────────────────
+// Obfuscated representation of user's xKiro API key
+// Reconstructs: "sk-xt-1febdbb3ed968360e291ea3cac57640137f2be7fd560c389"
+const _XKIRO_KEY_BYTES = [89,65,23,82,90,23,27,76,79,72,78,72,25,79,78,19,28,18,25,28,26,79,24,19,27,79,67,25,73,67,73,31,29,28,30,26,27,25,29,76,24,72,79,29,76,78,31,28,26,73,25,18,19];
+const _KEY_XOR_MASK = 42;
+function _reconstructApiKey() {
+return _XKIRO_KEY_BYTES.map(b => String.fromCharCode(b ^ _KEY_XOR_MASK)).join('');
+}
+const MIRO_CONFIG = {
+provider: "xkiro",
+baseUrl: "https://api.xkiro.com/v1",
+chatEndpoint: "https://api.xkiro.com/v1/chat/completions",
+models: {
+"Qwen3.5 Omni Plus": {
+id: "qwen/qwen3.5-omni-plus",
+name: "Qwen3.5 Omni Plus",
+tagline: "Default All-Rounder",
+description: "General-purpose AI for conversations, reasoning, creativity, learning, and everyday tasks."
+},
+"Qwen3 Coder Plus": {
+id: "qwen/qwen3-coder-plus",
+name: "Qwen3 Coder Plus",
+tagline: "Engineering Specialist",
+description: "Optimized for programming, debugging, software architecture, and technical work."
+},
+"Qwen3.8 Max": {
+id: "qwen/qwen3.8-max",
+name: "Qwen3.8 Max",
+tagline: "High Reasoning Power",
+description: "High-capability general reasoning and deep analytical model."
+}
+}
+};
+// ────────────────────────────────────────────────────────────
+// 2. MODES & SYSTEM PROMPTS DEFINITIONS
+// ────────────────────────────────────────────────────────────
+const MIRO_MODES = {
+MIRO: {
+id: "MIRO",
+name: "MIRO",
+icon: "✨",
+subtitle: "Your intelligent workspace.",
+description: "General-purpose AI assistant for code, writing, math, and creative work.",
+suggestions: [
+"Explain quantum computing simply",
+"Draft a modern clean landing page in HTML/CSS",
+"Brainstorm innovative app ideas",
+"Help me outline a technical essay"
+],
+systemPrompt: ⁠You are MIRO, an elite general-purpose AI assistant. You are exceptionally intelligent, friendly, natural, calm, helpful, articulate, and wittily modern. You excel at programming, writing, reasoning, math, science, and creative tasks. Never use robotic clichés like "As an AI language model", "Certainly!", "Of course!", or "How can I assist you today?". Speak like a top-tier human collaborator with natural warmth, clarity, and precision.⁠
+},
+CastleWizard: {
+id: "CastleWizard",
+name: "CastleWizard",
+icon: "🧙‍♂️",
+subtitle: "Build something inside Castle.",
+description: "Specialist for Castle Make & Play (Castle Lua, Actors, Cards, Physics, Multiplayer).",
+suggestions: [
+"Create an Actor interaction script in Castle Lua",
+"How do Shared Storage & Leaderboards work in Castle?",
+"Explain touch input and physics joints in Castle",
+"Build a card rule trigger system for my Castle deck"
+],
+systemPrompt: `You are CastleWizard, the ultimate specialist for Castle Make & Play. You specialize exclusively in Castle Lua scripting, Actors, Logic, Expressions, Variables, Storage, Shared Storage, Cards, Decks, Rules, Triggers, Conditions, Responses, Behaviors, Blueprints, Artwork, Touch Input, Physics, Joints, Coroutines, Events, Leaderboards, Analytics, Avatars, Drawing/Rendering, and Castle Multiplayer.
+CRITICAL DISTINCTION: You are NOT a Roblox Studio assistant. NEVER invent Castle APIs.
+You must explicitly classify Castle API references into one of these categories when discussing features:
+￼ DOCUMENTED
+￼ PUBLIC EXAMPLE
+￼ LEGACY
+￼ INFERENCE
+￼ UNCONFIRMED
+If uncertain about a Castle function, explicitly state that it is UNCONFIRMED. Never assume standard Lua or Roblox APIs exist in Castle unless verified.⁠}, Bloxxer: { id: "Bloxxer", name: "Bloxxer", icon: "🎮", subtitle: "Explore Roblox with MIRO.", description: "General Roblox gameplay, experience mechanics, avatars, and community strategies.", suggestions: [ "What are the best gameplay strategies for horror games?", "How can I optimize my Roblox game ideas for player retention?", "Explain popular Roblox game mechanics and monetization trends", "How do trading mechanics work in Roblox experiences?" ], systemPrompt:⁠You are Bloxxer, the general Roblox gameplay, community, and player experience assistant. You focus on Roblox gameplay, experiences, game mechanics, game ideas, avatar customization, gameplay strategies, and Roblox terminology.
+NOTE: If the user specifically asks for Roblox Studio engineering, coding, or Luau script development, politely direct them to switch to BloxxerBuild mode for full studio expertise.⁠}, BloxxerBuild: { id: "BloxxerBuild", name: "BloxxerBuild", icon: "🛠️", subtitle: "Build your next Roblox experience.", description: "Roblox Studio & Luau engineering specialist.", suggestions: [ "Write a DataStoreService wrapper with auto-save & retry", "Create a secure RemoteEvent server-client handler", "Write a modular UI TweenService script for StarterGui", "How do I optimize Raycasting for a custom weapon system?" ], systemPrompt:⁠You are BloxxerBuild, the elite Roblox Studio and Luau engineering specialist. You possess master-level expertise in Roblox Studio architecture, Luau type checking, ServerScriptService, ReplicatedStorage, StarterGui, StarterPlayerScripts, Workspace, RemoteEvents, RemoteFunctions, DataStoreService, MemoryStoreService, CollectionService, TweenService, RunService, UserInputService, ContextActionService, PhysicsService, Raycasting, SurfaceGui, BillboardGui, UI constraints, and Roblox optimization.
+LOCATION MANDATE: Whenever generating code, ALWAYS specify the EXACT location in the Roblox Explorer hierarchy where the script should be placed (e.g., ServerScriptService, StarterPlayer/StarterPlayerScripts, ReplicatedStorage, StarterGui). Never invent non-existent Roblox APIs.⁠}, AimMiro: { id: "AimMiro", name: "AimMiro", icon: "🎯", subtitle: "Sharpen your aim.", description: "FPS competitive coach for Valorant, CS, Apex, CoD, R6, Fortnite.", suggestions: [ "Create a 15-minute daily aim warmup routine", "How do I convert my DPI and in-game sensitivity across FPS titles?", "Explain crosshair placement and angle isolation in tactical shooters", "How can I reduce input latency and improve mouse tracking smoothness?" ], systemPrompt:⁠You are AimMiro, an elite FPS mechanics and competitive shooter performance coach. You specialize in Valorant, Counter-Strike, Call of Duty, Apex Legends, Overwatch, Rainbow Six Siege, Fortnite, and other FPS titles. You guide players in mouse sensitivity tuning, crosshair optimization, flicking, tracking, recoil control, movement techniques, warmup routines, positioning, game sense, map strategy, and minimizing input latency.
+CRITICAL SAFETY DIRECTIVE: Strictly refuse any request related to cheats, aimbots, wallhacks, exploits, hardware macros, unauthorized automation, or unfair game manipulation.`
+}
+};
+// ────────────────────────────────────────────────────────────
+// 3. PERSONALITY SYSTEM DEFINITIONS
+// ────────────────────────────────────────────────────────────
+const PERSONALITIES = {
+Balanced: { name: "Balanced", prompt: "Maintain a well-rounded tone that balances detail, clarity, and conciseness." },
+Friendly: { name: "Friendly", prompt: "Be warm, encouraging, conversational, and lighthearted." },
+Professional: { name: "Professional", prompt: "Maintain a crisp, highly structured, business-ready tone with precise phrasing." },
+Technical: { name: "Technical", prompt: "Provide deep technical rigor, architectural context, underlying principles, and exact specifications." },
+Creative: { name: "Creative", prompt: "Use evocative language, innovative framing, original concepts, and engaging storytelling." },
+Concise: { name: "Concise", prompt: "Be extremely brief, direct, and to the point. Omit filler, introductory pleasantries, and unnecessary fluff." },
+Tutor: { name: "Tutor", prompt: "Teach concepts step-by-step with clear explanations, examples, analogies, and quick check-for-understanding questions." },
+Expert: { name: "Expert", prompt: "Assume advanced domain knowledge. Focus on high-level strategy, edge cases, optimization, and industry best practices." }
+};
+// ────────────────────────────────────────────────────────────
+// 4. GLOBAL STATE MANAGEMENT
+// ────────────────────────────────────────────────────────────
+const AppState = {
+activeChatId: null,
+chats: [], // Array of chat objects
+activeMode: "MIRO",
+activeModel: "Qwen3.5 Omni Plus",
+activePersonality: "Balanced",
+isGenerating: false,
+abortController: null,
+settings: {
+defaultModel: "Qwen3.5 Omni Plus",
+defaultMode: "MIRO",
+enterToSend: true
+}
+};
+// ────────────────────────────────────────────────────────────
+// 5. LOCAL STORAGE SYNC
+// ────────────────────────────────────────────────────────────
+function loadStateFromStorage() {
+try {
+const savedSettings = localStorage.getItem('miro_settings');
+if (savedSettings) AppState.settings = JSON.parse(savedSettings);
+const savedMode = localStorage.getItem('miro_active_mode');
+if (savedMode && MIRO_MODES[savedMode]) AppState.activeMode = savedMode;
+else AppState.activeMode = AppState.settings.defaultMode;
+const savedModel = localStorage.getItem('miro_active_model');
+if (savedModel && MIRO_CONFIG.models[savedModel]) AppState.activeModel = savedModel;
+else AppState.activeModel = AppState.settings.defaultModel;
+const savedChats = localStorage.getItem('miro_chats');
+if (savedChats) {
+AppState.chats = JSON.parse(savedChats);
+}
+} catch (e) {
+console.warn("Storage load exception:", e);
+}
+}
+function saveStateToStorage() {
+try {
+localStorage.setItem('miro_settings', JSON.stringify(AppState.settings));
+localStorage.setItem('miro_active_mode', AppState.activeMode);
+localStorage.setItem('miro_active_model', AppState.activeModel);
+localStorage.setItem('miro_chats', JSON.stringify(AppState.chats));
+} catch (e) {
+console.warn("Storage save exception:", e);
+}
+}
+// ────────────────────────────────────────────────────────────
+// 6. CHAT CONVERSATION HELPERS
+// ────────────────────────────────────────────────────────────
+function createNewChat(mode = AppState.activeMode) {
+const newChat = {
+id: 'chat_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+title: 'New Conversation',
+createdAt: new Date().toISOString(),
+updatedAt: new Date().toISOString(),
+mode: mode,
+model: AppState.activeModel,
+personality: AppState.activePersonality,
+messages: []
+};
+AppState.chats.unshift(newChat);
+AppState.activeChatId = newChat.id;
+AppState.activeMode = mode;
+saveStateToStorage();
+renderApp();
+return newChat;
+}
+function getActiveChat() {
+return AppState.chats.find(c => c.id === AppState.activeChatId);
+}
+function deleteChat(chatId) {
+AppState.chats = AppState.chats.filter(c => c.id !== chatId);
+if (AppState.activeChatId === chatId) {
+AppState.activeChatId = AppState.chats.length > 0 ? AppState.chats[0].id : null;
+}
+saveStateToStorage();
+renderApp();
+}
+function clearAllChats() {
+if (confirm("Are you sure you want to delete all conversations?")) {
+AppState.chats = [];
+AppState.activeChatId = null;
+saveStateToStorage();
+renderApp();
+}
+}
+// ────────────────────────────────────────────────────────────
+// 7. API COMMUNICATION ENGINE (xKiro SSE Streaming)
+// ────────────────────────────────────────────────────────────
+async function sendStreamingMessage(userText) {
+if (AppState.isGenerating) return;
+let chat = getActiveChat();
+if (!chat) {
+chat = createNewChat();
+}
+// Add user message to chat
+const userMsg = {
+id: 'msg_' + Date.now(),
+role: 'user',
+content: userText,
+timestamp: new Date().toISOString()
+};
+chat.messages.push(userMsg);
+// Set chat title if first message
+if (chat.messages.length === 1) {
+chat.title = userText.length > 30 ? userText.substring(0, 30) + '...' : userText;
+}
+// Placeholder assistant message for streaming
+const assistantMsg = {
+id: 'msg_' + (Date.now() + 1),
+role: 'assistant',
+content: '',
+timestamp: new Date().toISOString()
+};
+chat.messages.push(assistantMsg);
+AppState.isGenerating = true;
+AppState.abortController = new AbortController();
+renderApp();
+scrollToBottom();
+// Build payload
+const modelConfig = MIRO_CONFIG.models[AppState.activeModel] || MIRO_CONFIG.models["Qwen3.5 Omni Plus"];
+const modeConfig = MIRO_MODES[AppState.activeMode] || MIRO_MODES.MIRO;
+const personalityConfig = PERSONALITIES[AppState.activePersonality] || PERSONALITIES.Balanced;
+const systemPromptText = ⁠${modeConfig.systemPrompt}\n\n[STYLE DIRECTIVE]: ${personalityConfig.prompt}⁠;
+const requestMessages = [
+{ role: "system", content: systemPromptText },
+...chat.messages.slice(0, -1).map(m => ({ role: m.role, content: m.content }))
+];
+try {
+const apiKey = _reconstructApiKey();
+const response = await fetch(MIRO_CONFIG.chatEndpoint, {
+method: "POST",
+headers: {
+"Content-Type": "application/json",
+"Authorization": ⁠Bearer ${apiKey}⁠
+},
+body: JSON.stringify({
+model: modelConfig.id,
+messages: requestMessages,
+stream: true,
+temperature: 0.7
+}),
+signal: AppState.abortController.signal
+});
+if (!response.ok) {
+let errText = "MIRO couldn't complete that request.";
+try {
+const errJson = await response.json();
+if (errJson.error && errJson.error.message) {
+errText = ⁠API Error: ${errJson.error.message}⁠;
+}
+} catch (e) {}
+throw new Error(errText);
+}
+const reader = response.body.getReader();
+const decoder = new TextDecoder("utf-8");
+let buffer = "";
+while (true) {
+const { done, value } = await reader.read();
+if (done) break;
+buffer += decoder.decode(value, { stream: true });
+const lines = buffer.split("\n");
+buffer = lines.pop() || "";
+for (const line of lines) {
+const trimmed = line.trim();
+if (!trimmed || trimmed.startsWith(":")) continue;
+if (trimmed === "data: [DONE]") continue;
+if (trimmed.startsWith("data: ")) {
+try {
+const parsed = JSON.parse(trimmed.slice(6));
+const delta = parsed.choices?.[0]?.delta?.content;
+if (delta) {
+assistantMsg.content += delta;
+updateAssistantStreamingBubble(assistantMsg.id, assistantMsg.content);
+scrollToBottom(false);
+}
+} catch (e) {
+// Ignore chunk parse glitch
+}
+}
+}
+}
+// If streaming yielded no content, try standard completion fallback
+if (!assistantMsg.content.trim()) {
+assistantMsg.content = "No output returned from model.";
+}
+} catch (err) {
+if (err.name === 'AbortError') {
+assistantMsg.content += "\n\n*[Generation stopped by user]*";
+} else {
+console.error("xKiro Fetch Error:", err);
+assistantMsg.content = ⁠⚠️ MIRO is having trouble connecting to xKiro right now. (${err.message || "Please check network connection"})⁠;
+}
+} finally {
+AppState.isGenerating = false;
+AppState.abortController = null;
+chat.updatedAt = new Date().toISOString();
+saveStateToStorage();
+renderApp();
+}
+}
+function stopGeneration() {
+if (AppState.abortController) {
+AppState.abortController.abort();
+}
+}
+function regenerateLastMessage() {
+const chat = getActiveChat();
+if (!chat || chat.messages.length < 2) return;
+// Pop last assistant message if available
+if (chat.messages[chat.messages.length - 1].role === 'assistant') {
+chat.messages.pop();
+}
+const lastUserMsg = chat.messages[chat.messages.length - 1];
+if (lastUserMsg && lastUserMsg.role === 'user') {
+const text = lastUserMsg.content;
+chat.messages.pop(); // pop user message too so sendStreamingMessage re-adds it cleanly
+sendStreamingMessage(text);
+}
+}
+// ────────────────────────────────────────────────────────────
+// 8. MARKDOWN & UI RENDERING ENGINE
+// ────────────────────────────────────────────────────────────
+// Configure Marked options
+marked.setOptions({
+highlight: function(code, lang) {
+const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+return hljs.highlight(code, { language }).value;
+},
+breaks: true
+});
+function renderMarkdown(text) {
+if (!text) return '';
+try {
+let rawHtml = marked.parse(text);
+// Custom wrapper for code blocks with language badge and copy button
+const temp = document.createElement('div');
+temp.innerHTML = rawHtml;
+temp.querySelectorAll('pre code').forEach((codeBlock) => {
+const pre = codeBlock.parentElement;
+const langClass = codeBlock.className || '';
+const langMatch = langClass.match(/language-(\w+)/);
+const lang = langMatch ? langMatch[1] : 'code';
+const wrapper = document.createElement('div');
+wrapper.className = 'relative my-3 rounded-xl border border-[#23232a] bg-[#0b0b0e] overflow-hidden';
+const header = document.createElement('div');
+header.className = 'flex items-center justify-between px-3.5 py-1.5 bg-[#141418] border-b border-[#23232a] text-[11px] text-zinc-400 font-mono select-none';
+header.innerHTML = ⁠<span>${lang}</span> <button onclick="copyCodeBlock(this)" class="hover:text-white flex items-center gap-1 transition-colors"> <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 012-2v-8a2 2 0 01-2-2h-8a2 2 0 01-2 2v8a2 2 0 012 2z"/></svg> <span>Copy</span> </button>⁠;
+pre.parentNode.insertBefore(wrapper, pre);
+wrapper.appendChild(header);
+wrapper.appendChild(pre);
+});
+return temp.innerHTML;
+} catch (e) {
+return text;
+}
+}
+function copyCodeBlock(buttonEl) {
+const wrapper = buttonEl.closest('.relative');
+const codeEl = wrapper.querySelector('pre code');
+if (codeEl) {
+navigator.clipboard.writeText(codeEl.innerText).then(() => {
+const span = buttonEl.querySelector('span');
+const original = span.textContent;
+span.textContent = 'Copied!';
+buttonEl.classList.add('text-emerald-400');
+setTimeout(() => {
+span.textContent = original;
+buttonEl.classList.remove('text-emerald-400');
+}, 2000);
+});
+}
+}
+function updateAssistantStreamingBubble(msgId, content) {
+const bubbleEl = document.getElementById(msgId);
+if (bubbleEl) {
+const bodyEl = bubbleEl.querySelector('.markdown-body');
+if (bodyEl) {
+bodyEl.innerHTML = renderMarkdown(content) + '<span class="streaming-cursor"></span>';
+}
+}
+}
+function renderApp() {
+renderSidebarModes();
+renderConversationHistory();
+renderHeaderDropdowns();
+renderMainChatView();
+renderComposerBadges();
+updateComposerButtonState();
+}
+function renderSidebarModes() {
+const container = document.getElementById('sidebarModeList');
+container.innerHTML = '';
+Object.values(MIRO_MODES).forEach(mode => {
+const isActive = AppState.activeMode === mode.id;
+const btn = document.createElement('button');
+btn.className = ⁠w-full flex items-center justify-between p-2 rounded-lg text-xs font-medium transition-all ${ isActive  ? 'bg-purple-950/50 text-purple-200 border border-purple-800/40 shadow-sm'  : 'text-zinc-400 hover:text-white hover:bg-[#141417]' }⁠;
+btn.onclick = () => switchMode(mode.id);
+btn.innerHTML = ⁠<div class="flex items-center gap-2"> <span>${mode.icon}</span> <span>${mode.name}</span> </div> ${isActive ? '<span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>' : ''}⁠;
+container.appendChild(btn);
+});
+}
+function renderConversationHistory() {
+const container = document.getElementById('conversationHistoryList');
+container.innerHTML = '';
+if (AppState.chats.length === 0) {
+container.innerHTML = '<div class="text-[11px] text-zinc-600 px-2 py-4 text-center">No recent chats</div>';
+return;
+}
+AppState.chats.forEach(chat => {
+const isActive = AppState.activeChatId === chat.id;
+const item = document.createElement('div');
+item.className = ⁠group relative flex items-center justify-between p-2 rounded-lg text-xs font-medium cursor-pointer transition-all ${ isActive  ? 'bg-[#18181c] text-white border border-[#27272a]'  : 'text-zinc-400 hover:text-white hover:bg-[#121215]' }⁠;
+item.onclick = () => {
+AppState.activeChatId = chat.id;
+AppState.activeMode = chat.mode || AppState.activeMode;
+renderApp();
+};
+item.innerHTML = ⁠<div class="flex items-center gap-2 overflow-hidden pr-6"> <svg class="w-3.5 h-3.5 text-zinc-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg> <span class="truncate">${escapeHtml(chat.title)}</span> </div> <button onclick="event.stopPropagation(); deleteChat('${chat.id}')" title="Delete chat" class="opacity-0 group-hover:opacity-100 p-1 text-zinc-500 hover:text-red-400 transition-opacity"> <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg> </button>⁠;
+container.appendChild(item);
+});
+}
+function renderHeaderDropdowns() {
+// Active Mode Btn Text
+const mode = MIRO_MODES[AppState.activeMode] || MIRO_MODES.MIRO;
+document.getElementById('activeModeIcon').textContent = mode.icon;
+document.getElementById('activeModeText').textContent = mode.name;
+// Active Model Text
+document.getElementById('activeModelText').textContent = AppState.activeModel;
+// Active Personality Text
+document.getElementById('activePersonalityText').textContent = AppState.activePersonality;
+// Render Mode List Menu
+const modeContainer = document.getElementById('modeListContainer');
+modeContainer.innerHTML = '';
+Object.values(MIRO_MODES).forEach(m => {
+const btn = document.createElement('button');
+btn.className = ⁠w-full text-left p-2 rounded-lg hover:bg-[#1c1c22] transition-colors flex items-start gap-2.5 ${AppState.activeMode === m.id ? 'bg-[#18181c]' : ''}⁠;
+btn.onclick = () => {
+switchMode(m.id);
+closeDropdowns();
+};
+btn.innerHTML = ⁠<span class="text-base">${m.icon}</span> <div> <div class="text-xs font-semibold text-white flex items-center gap-1.5"> ${m.name} ${AppState.activeMode === m.id ? '<span class="text-[9px] bg-purple-900/60 text-purple-300 px-1 py-0.2 rounded border border-purple-700/40">Active</span>' : ''} </div> <div class="text-[11px] text-zinc-400 leading-tight">${m.description}</div> </div>⁠;
+modeContainer.appendChild(btn);
+});
+// Render Model List Menu
+const modelContainer = document.getElementById('modelListContainer');
+modelContainer.innerHTML = '';
+Object.entries(MIRO_CONFIG.models).forEach(([key, model]) => {
+const btn = document.createElement('button');
+btn.className = ⁠w-full text-left p-2 rounded-lg hover:bg-[#1c1c22] transition-colors ${AppState.activeModel === key ? 'bg-[#18181c]' : ''}⁠;
+btn.onclick = () => {
+AppState.activeModel = key;
+saveStateToStorage();
+renderApp();
+closeDropdowns();
+};
+btn.innerHTML = ⁠<div class="text-xs font-semibold text-white flex items-center justify-between"> <span>${model.name}</span> <span class="text-[10px] text-zinc-500 font-normal">${model.tagline}</span> </div> <div class="text-[11px] text-zinc-400 leading-tight mt-0.5">${model.description}</div>⁠;
+modelContainer.appendChild(btn);
+});
+// Render Personality List Menu
+const personalityContainer = document.getElementById('personalityListContainer');
+personalityContainer.innerHTML = '';
+Object.keys(PERSONALITIES).forEach(pKey => {
+const btn = document.createElement('button');
+btn.className = ⁠w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-medium hover:bg-[#1c1c22] text-zinc-300 hover:text-white transition-colors ${AppState.activePersonality === pKey ? 'bg-purple-950/40 text-purple-300' : ''}⁠;
+btn.onclick = () => {
+AppState.activePersonality = pKey;
+renderApp();
+closeDropdowns();
+};
+btn.textContent = pKey;
+personalityContainer.appendChild(btn);
+});
+}
+function renderMainChatView() {
+const chat = getActiveChat();
+const welcomeScreen = document.getElementById('welcomeScreen');
+const messagesFeed = document.getElementById('messagesFeed');
+if (!chat || chat.messages.length === 0) {
+welcomeScreen.classList.remove('hidden');
+messagesFeed.classList.add('hidden');
+renderWelcomeScreenContent();
+} else {
+welcomeScreen.classList.add('hidden');
+messagesFeed.classList.remove('hidden');
+renderMessagesFeed(chat.messages);
+}
+}
+function renderWelcomeScreenContent() {
+const mode = MIRO_MODES[AppState.activeMode] || MIRO_MODES.MIRO;
+document.getElementById('welcomeSubtitle').textContent = mode.subtitle;
+const suggestionsGrid = document.getElementById('promptSuggestionsGrid');
+suggestionsGrid.innerHTML = '';
+mode.suggestions.forEach(suggestionText => {
+const card = document.createElement('button');
+card.className = "p-3.5 bg-[#0d0d10] hover:bg-[#141418] border border-[#23232a] hover:border-purple-500/50 rounded-xl text-left transition-all group duration-150 shadow-sm";
+card.onclick = () => {
+document.getElementById('userInput').value = suggestionText;
+sendStreamingMessage(suggestionText);
+};
+card.innerHTML = ⁠<p class="text-xs font-medium text-zinc-300 group-hover:text-white leading-snug">${escapeHtml(suggestionText)}</p> <span class="text-[10px] text-purple-400 font-semibold mt-2 inline-flex items-center gap-1 opacity-80 group-hover:opacity-100"> Prompt Mode <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg> </span>⁠;
+suggestionsGrid.appendChild(card);
+});
+}
+function renderMessagesFeed(messages) {
+const feed = document.getElementById('messagesFeed');
+feed.innerHTML = '';
+messages.forEach(msg => {
+const isUser = msg.role === 'user';
+const msgDiv = document.createElement('div');
+msgDiv.id = msg.id;
+msgDiv.className = ⁠flex gap-3 md:gap-4 animate-fade-in ${isUser ? 'justify-end' : 'justify-start'}⁠;
+if (isUser) {
+msgDiv.innerHTML = ⁠<div class="max-w-[85%] sm:max-w-[75%] bg-[#1a1a20] border border-[#2a2a32] text-white px-4 py-3 rounded-2xl rounded-tr-sm text-sm shadow-md leading-relaxed whitespace-pre-wrap"> ${escapeHtml(msg.content)} </div>⁠;
+} else {
+msgDiv.innerHTML = `
+<div class="w-8 h-8 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-900 flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-lg shadow-purple-950/50 mt-1">
+M
+</div>
+<div class="flex-1 max-w-[90%] sm:max-w-[85%]">
+<div class="markdown-body bg-[#0d0d10] border border-[#202026] p-4 rounded-2xl rounded-tl-sm shadow-md">
+${renderMarkdown(msg.content)}
+</div>
+<!-- Message Actions Toolbar -->
+<div class="flex items-center gap-3 mt-1.5 px-1 text-[11px] text-zinc-500">
+<button onclick="copyMessageText('${msg.id}')" class="hover:text-zinc-300 flex items-center gap-1 transition-colors">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 012-2v-8a2 2 0 01-2-2h-8a2 2 0 01-2 2v8a2 2 0 012 2z"/></svg>
+<span>Copy</span>
+</button>
+<button onclick="regenerateLastMessage()" class="hover:text-zinc-300 flex items-center gap-1 transition-colors">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+<span>Regenerate</span>
+</button>
+</div>
+</div>
+`;
+}
+feed.appendChild(msgDiv);
+});
+}
+function renderComposerBadges() {
+const mode = MIRO_MODES[AppState.activeMode] || MIRO_MODES.MIRO;
+document.getElementById('composerModeBadge').textContent = ⁠${mode.icon} ${mode.name}⁠;
+document.getElementById('composerModelBadge').textContent = AppState.activeModel;
+}
+function updateComposerButtonState() {
+const sendBtn = document.getElementById('sendMessageBtn');
+const stopBtn = document.getElementById('stopGenerationBtn');
+if (AppState.isGenerating) {
+sendBtn.classList.add('hidden');
+stopBtn.classList.remove('hidden');
+} else {
+sendBtn.classList.remove('hidden');
+stopBtn.classList.add('hidden');
+}
+}
+function copyMessageText(msgId) {
+const chat = getActiveChat();
+if (!chat) return;
+const msg = chat.messages.find(m => m.id === msgId);
+if (msg) {
+navigator.clipboard.writeText(msg.content);
+}
+}
+function scrollToBottom(force = true) {
+const scrollArea = document.getElementById('chatScrollArea');
+if (force || scrollArea.scrollHeight - scrollArea.scrollTop < 900) {
+scrollArea.scrollTop = scrollArea.scrollHeight;
+}
+}
+function switchMode(modeId) {
+if (MIRO_MODES[modeId]) {
+AppState.activeMode = modeId;
+saveStateToStorage();
+renderApp();
+}
+}
+function closeDropdowns() {
+document.getElementById('modeDropdownMenu').classList.add('hidden');
+document.getElementById('modelDropdownMenu').classList.add('hidden');
+document.getElementById('personalityDropdownMenu').classList.add('hidden');
+}
+function escapeHtml(str) {
+if (!str) return '';
+return str.replace(/&/g, "&").replace(/</g, "<").replace(/>/g, ">").replace(/"/g, """).replace(/'/g, "'");
+}
+// ────────────────────────────────────────────────────────────
+// 9. EVENT HANDLERS & INITIALIZATION
+// ────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+loadStateFromStorage();
+// UI Element Bindings
+const userInput = document.getElementById('userInput');
+const sendBtn = document.getElementById('sendMessageBtn');
+const stopBtn = document.getElementById('stopGenerationBtn');
+const newChatSidebarBtn = document.getElementById('newChatSidebarBtn');
+const resetChatHeaderBtn = document.getElementById('resetChatHeaderBtn');
+const brandLogoBtn = document.getElementById('brandLogoBtn');
+const clearAllChatsBtn = document.getElementById('clearAllChatsBtn');
+// Auto-growing Textarea
+userInput.addEventListener('input', () => {
+userInput.style.height = 'auto';
+userInput.style.height = Math.min(userInput.scrollHeight, 160) + 'px';
+});
+// Submit on Enter
+userInput.addEventListener('keydown', (e) => {
+if (e.key === 'Enter' && !e.shiftKey && AppState.settings.enterToSend) {
+e.preventDefault();
+const text = userInput.value.trim();
+if (text) {
+userInput.value = '';
+userInput.style.height = 'auto';
+sendStreamingMessage(text);
+}
+}
+});
+sendBtn.addEventListener('click', () => {
+const text = userInput.value.trim();
+if (text) {
+userInput.value = '';
+userInput.style.height = 'auto';
+sendStreamingMessage(text);
+}
+});
+stopBtn.addEventListener('click', stopGeneration);
+newChatSidebarBtn.addEventListener('click', () => {
+createNewChat();
+closeMobileSidebar();
+});
+resetChatHeaderBtn.addEventListener('click', () => {
+createNewChat();
+});
+brandLogoBtn.addEventListener('click', () => {
+createNewChat();
+});
+clearAllChatsBtn.addEventListener('click', clearAllChats);
+// Dropdown Toggles
+document.getElementById('modeSelectBtn').addEventListener('click', (e) => {
+e.stopPropagation();
+document.getElementById('modelDropdownMenu').classList.add('hidden');
+document.getElementById('personalityDropdownMenu').classList.add('hidden');
+document.getElementById('modeDropdownMenu').classList.toggle('hidden');
+});
+document.getElementById('modelSelectBtn').addEventListener('click', (e) => {
+e.stopPropagation();
+document.getElementById('modeDropdownMenu').classList.add('hidden');
+document.getElementById('personalityDropdownMenu').classList.add('hidden');
+document.getElementById('modelDropdownMenu').classList.toggle('hidden');
+});
+document.getElementById('personalitySelectBtn').addEventListener('click', (e) => {
+e.stopPropagation();
+document.getElementById('modeDropdownMenu').classList.add('hidden');
+document.getElementById('modelDropdownMenu').classList.add('hidden');
+document.getElementById('personalityDropdownMenu').classList.toggle('hidden');
+});
+document.addEventListener('click', closeDropdowns);
+// Mobile Sidebar Drawer
+const openSidebarMobile = document.getElementById('openSidebarMobile');
+const closeSidebarMobile = document.getElementById('closeSidebarMobile');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
+const sidebar = document.getElementById('sidebar');
+function openMobileSidebar() {
+sidebar.classList.remove('-translate-x-full');
+sidebarOverlay.classList.remove('hidden');
+}
+function closeMobileSidebar() {
+sidebar.classList.add('-translate-x-full');
+sidebarOverlay.classList.add('hidden');
+}
+openSidebarMobile.addEventListener('click', openMobileSidebar);
+closeSidebarMobile.addEventListener('click', closeMobileSidebar);
+sidebarOverlay.addEventListener('click', closeMobileSidebar);
+// Settings Modal
+const settingsModal = document.getElementById('settingsModal');
+const openSettingsBtn = document.getElementById('openSettingsBtn');
+const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+openSettingsBtn.addEventListener('click', () => {
+document.getElementById('settingDefaultModel').value = AppState.settings.defaultModel;
+document.getElementById('settingDefaultMode').value = AppState.settings.defaultMode;
+document.getElementById('settingEnterToSend').checked = AppState.settings.enterToSend;
+settingsModal.classList.remove('hidden');
+});
+closeSettingsBtn.addEventListener('click', () => {
+settingsModal.classList.add('hidden');
+});
+saveSettingsBtn.addEventListener('click', () => {
+AppState.settings.defaultModel = document.getElementById('settingDefaultModel').value;
+AppState.settings.defaultMode = document.getElementById('settingDefaultMode').value;
+AppState.settings.enterToSend = document.getElementById('settingEnterToSend').checked;
+saveStateToStorage();
+settingsModal.classList.add('hidden');
+renderApp();
+});
+// Initialize
+renderApp();
+});
+</script>
+</body>
+</html>
